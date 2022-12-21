@@ -95,9 +95,9 @@ MODULE initialization
             
         DO i=1,Nx
             x_div = ((x_axis(i))/z_1)        
-            rho_grid(j,i) = EXP(-(x_div**2)-(y_div**2))
             DO j=1,Ny
                 y_div = ((y_axis(j))/z_1)
+                rho_grid(j,i) = EXP(-(x_div**2)-(y_div**2))
             
             END DO
         
@@ -158,15 +158,15 @@ MODULE phi_calc
 
         zed=0
 
-        DO WHILE(etot/drms > 0.00001)
+        DO WHILE(etot/drms > 0.00001_REAL64)
             
             DO i=1,Nx
                 DO j=1,Ny                
                     dens=rho_grid(j,i)                                      !Calculates phi values for whole grid once
-                    div1=((phi_grid(j,i+1) + phi_grid(j,i-1))/(dx**2))
-                    div2=((phi_grid(j+1,i) + phi_grid(j-1,i))/(dy**2))
+                    div1=((phi_grid(j,i+1) + phi_grid(j,i-1))/(dx**two))
+                    div2=((phi_grid(j+1,i) + phi_grid(j-1,i))/(dy**two))
                     denom=((two/(dx**two))+(two/(dy**two)))
-                    phi_grid(i,j)=-((dens-div1-div2)/denom)
+                    phi_grid(j,i)=-((dens-div1-div2)/denom)
 
                 END DO
 
@@ -180,9 +180,10 @@ MODULE phi_calc
             
             DO i=1,Nx
                 DO j=1,Ny
-                                    dens=rho_grid(j,i)
-                    conv1 = ((phi_grid(j,i-1) - (two*(phi_grid(j,i))) + phi_grid(j,i+1))/(dx**2))
-                    conv2 = ((phi_grid(j-1,i) - (two*(phi_grid(j,i))) + phi_grid(j+1,i))/(dy**2))
+                    
+                    dens=rho_grid(j,i)
+                    conv1 = ((phi_grid(j,i-1) - (two*(phi_grid(j,i))) + phi_grid(j,i+1))/(dx**two))
+                    conv2 = ((phi_grid(j-1,i) - (two*(phi_grid(j,i))) + phi_grid(j+1,i))/(dy**two))
                     
                     etot = etot + ABS(conv1 + conv2 - dens)
 
@@ -192,14 +193,14 @@ MODULE phi_calc
             
             END DO
 
-            drms = SQRT((1/N)*(drms_sum))
+            drms = SQRT((1/N)*(ABS(drms_sum)))
             zed=zed+1
         
         END DO
         PRINT*,'zed=', zed
         PRINT*,etot
         PRINT*,'------------------------------------------------------------------------------'
-        PRINT*,drms
+        PRINT*,drms_sum
         PRINT*,'------------------------------------------------------------------------------'
    
 
@@ -216,6 +217,7 @@ PROGRAM main
     !USE ascii_display
     USE domain_tools
     USE phi_calc
+    USE command_line
     IMPLICIT NONE
     INTEGER :: Ny, Nx, i, lower
     REAL(REAL64), DIMENSION(:,:), ALLOCATABLE :: grid, rho_grid, phi_grid
