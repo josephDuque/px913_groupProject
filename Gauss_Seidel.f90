@@ -197,11 +197,11 @@ MODULE phi_calc
             zed=zed+1
         
         END DO
-        PRINT*,'zed=', zed
-        PRINT*,etot
-        PRINT*,'------------------------------------------------------------------------------'
-        PRINT*,drms_sum
-        PRINT*,'------------------------------------------------------------------------------'
+        !PRINT*,'zed=', zed
+        !PRINT*,etot
+        !PRINT*,'------------------------------------------------------------------------------'
+        !PRINT*,drms_sum
+        !PRINT*,'------------------------------------------------------------------------------'
    
 
 
@@ -210,7 +210,34 @@ MODULE phi_calc
 END MODULE phi_calc
 
 
-PROGRAM main
+MODULE Electric_field
+    USE iso_fortran_env
+    IMPLICIT NONE
+    CONTAINS
+
+    SUBROUTINE E_fields(E_field_x, E_field_y, phi_grid, dx, dy, Nx, Ny,lower)
+        INTEGER, INTENT(IN) :: Nx, Ny, lower
+        REAL(REAL64), DIMENSION(:,:), INTENT(INOUT) :: E_field_x, E_field_y
+        REAL(REAL64), DIMENSION(lower:,lower:), INTENT(IN) :: phi_grid
+        REAL(REAL64), INTENT(IN) :: dx, dy
+        REAL(REAL64) :: two
+        INTEGER :: i, j
+
+        two = 2.0_REAL64
+        DO j=1,Ny
+            Do i=1,Nx
+                E_field_x(j,i) = ((phi_grid(j,i+1) - phi_grid(j,i-1))/(two*dx))
+                E_field_y(j,i) = ((phi_grid(j+1,i) - phi_grid(j-1,i))/(two*dy))
+
+            END DO
+        
+        END DO
+    END SUBROUTINE
+
+END MODULE Electric_field
+
+
+PROGRAM main                !REMEMBER KING, I HAVE INDEXED IN STRANGE WAYS (J,I)
     USE iso_fortran_env
     USE import_params
     USE initialization
@@ -218,9 +245,10 @@ PROGRAM main
     USE domain_tools
     USE phi_calc
     USE command_line
+    USE Electric_field
     IMPLICIT NONE
     INTEGER :: Ny, Nx, i, lower
-    REAL(REAL64), DIMENSION(:,:), ALLOCATABLE :: grid, rho_grid, phi_grid
+    REAL(REAL64), DIMENSION(:,:), ALLOCATABLE :: grid, rho_grid, phi_grid, E_field_x, E_field_y
     REAL(REAL64), DIMENSION(:), ALLOCATABLE :: x_axis, y_axis
     REAL(REAL64), DIMENSION(2) :: axis_range
     REAL(REAL64) :: dx, dy
@@ -288,11 +316,19 @@ PROGRAM main
     !---------------------------------------Generate phi_grid------------------------------------------------------------
     ALLOCATE(phi_grid(0:Ny+1,0:Nx+1))
     phi_grid = grid
-    CALL phi(lower, phi_grid, Nx, Ny, rho_grid, dx, dy)
-    PRINT*,rho_grid
-    PRINT*,'---------------------------------------------------------------------------'
-    PRINT*,phi_grid
-    PRINT*,'---------------------------------------------------------------------------'
+    
+    ALLOCATE(E_field_x(Ny,Nx))
+    ALLOCATE(E_field_y(Ny,Nx))
+    
+    DO i=1,1000
+        CALL phi(lower, phi_grid, Nx, Ny, rho_grid, dx, dy)
+        CALL E_fields(E_field_x, E_field_y, phi_grid, dx, dy, Nx, Ny,lower)
+    END DO
+
+    !PRINT*,rho_grid
+    !PRINT*,'---------------------------------------------------------------------------'
+    !PRINT*,phi_grid
+    !RINT*,'---------------------------------------------------------------------------'
     
 
     
@@ -314,6 +350,9 @@ PROGRAM main
     !PRINT*, rho_grid
     DEALLOCATE(rho_grid)
     DEALLOCATE(grid)
+    DEALLOCATE(phi_grid)
+    DEALLOCATE(E_field_x)
+    DEALLOCATE(E_field_y)
 
 
 
