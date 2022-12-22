@@ -224,8 +224,8 @@ MODULE Electric_field
         INTEGER :: i, j
 
         two = 2.0_REAL64
-        DO j=1,Ny
-            Do i=1,Nx
+        DO i=1,Nx
+            Do j=1,Ny
                 E_field_x(j,i) = ((phi_grid(j,i+1) - phi_grid(j,i-1))/(two*dx))
                 E_field_y(j,i) = ((phi_grid(j+1,i) - phi_grid(j-1,i))/(two*dy))
 
