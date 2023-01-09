@@ -298,7 +298,7 @@ PROGRAM main                !REMEMBER KING, I HAVE INDEXED IN STRANGE WAYS (J,I)
 
     ALLOCATE(grid(0:Ny+1,0:Nx+1))
 !-------------------------------------------------Initialise All Cells, Then Set Ghost Cells-----------------------------------------------------
-    grid=1
+    grid=1.0_REAL64
     
     DO i=0,Nx+1
         grid(0,i) = 0.0
