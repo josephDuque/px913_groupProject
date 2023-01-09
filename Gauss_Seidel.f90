@@ -74,7 +74,7 @@ MODULE initialization
         REAL(REAL64), DIMENSION(lower:,lower:), INTENT(INOUT) :: rho_grid
                 
 
-        rho_grid = 0_REAL64
+        rho_grid = 0.0_REAL64
 
         !Need to set initial velocity and position
 
@@ -121,12 +121,12 @@ MODULE initialization
 
 
         DO i=1,Nx
-            x_div = ((x_axis(i)+0.25)/z_1)
+            x_div = ((x_axis(i)+0.25_REAL64)/z_1)
 
             DO j=1,Ny
-                y_div = ((y_axis(j)+0.25)/z_1)
-                extra_divy = ((y_axis(j)-0.75)/z_2)
-                extra_divx = ((x_axis(i)-0.75)/z_2)
+                y_div = ((y_axis(j)+0.25_REAL64)/z_1)
+                extra_divy = ((y_axis(j)-0.75_REAL64)/z_2)
+                extra_divx = ((x_axis(i)-0.75_REAL64)/z_2)
                 rho_grid(j,i) = EXP(-(x_div**2)-(y_div**2)) + EXP(-(extra_divx**2)-(extra_divy**2))
             
             END DO
@@ -156,13 +156,13 @@ MODULE phi_calc
         etot = 10.0_REAL64
         drms = 1.0_REAL64
 
-        zed=0
+        zed=0_INT32
         DO i=1,Nx
             DO j=1,Ny                
                 dens=rho_grid(j,i)                                      
-                div1=((phi_grid(j,i+1) + phi_grid(j,i-1))/(dx**two))
-                div2=((phi_grid(j+1,i) + phi_grid(j-1,i))/(dy**two))
-                denom=((two/(dx**two))+(two/(dy**two)))
+                div1=((phi_grid(j,i+1) + phi_grid(j,i-1))/(dx**2))
+                div2=((phi_grid(j+1,i) + phi_grid(j-1,i))/(dy**2))
+                denom=((two/(dx**2))+(two/(dy**2)))
                 phi_grid(j,i)=(-(ABS(dens-div1-div2)/denom))            !Calculate one initial set of elements for phi grid.
                                                                         !ABS() in final line of DO loop initializes grid to give           
             END DO                                                      !positive values of 'dmrs', allowing convergence criteria to work.
@@ -174,9 +174,9 @@ MODULE phi_calc
         DO i=1,Nx
             DO j=1,Ny                
                 dens=rho_grid(j,i)                                      
-                div1=((phi_grid(j,i+1) + phi_grid(j,i-1))/(dx**two))
-                div2=((phi_grid(j+1,i) + phi_grid(j-1,i))/(dy**two))
-                denom=((two/(dx**two))+(two/(dy**two)))
+                div1=((phi_grid(j,i+1) + phi_grid(j,i-1))/(dx**2))
+                div2=((phi_grid(j+1,i) + phi_grid(j-1,i))/(dy**2))
+                denom=((two/(dx**2))+(two/(dy**2)))
                 phi_grid(j,i)=(-((dens-div1-div2)/denom))            !Calculate one initial set of elements for phi grid.
                                                                         !ABS() in final line of DO loop initializes grid to give           
             END DO                                                      !positive values of 'dmrs', allowing convergence criteria to work.
@@ -189,16 +189,16 @@ MODULE phi_calc
             DO i=1,Nx
                 DO j=1,Ny                
                     dens=rho_grid(j,i)                                      !Calculates phi values for whole grid once
-                    div1=((phi_grid(j,i+1) + phi_grid(j,i-1))/(dx**two))
-                    div2=((phi_grid(j+1,i) + phi_grid(j-1,i))/(dy**two))
-                    denom=((two/(dx**two))+(two/(dy**two)))
+                    div1=((phi_grid(j,i+1) + phi_grid(j,i-1))/(dx**2))
+                    div2=((phi_grid(j+1,i) + phi_grid(j-1,i))/(dy**2))
+                    denom=((two/(dx**2))+(two/(dy**2)))
                     phi_grid(j,i)=-((dens-div1-div2)/denom)
 
                 END DO
 
             END DO
 
-            N = REAL(Nx, kind=REAL64)*REAL(Ny, kind=REAL64)                                                        !Total no. of elements
+            N = REAL(Nx, kind=REAL64)*REAL(Ny, kind=REAL64)    !Make REAL to allow use of N in generation of REALs below.
 
             etot = 0.0_REAL64
             drms_sum = 0.0_REAL64       !(Re-)Initialise values
@@ -209,8 +209,8 @@ MODULE phi_calc
                 DO j=1,Ny
                     
                     dens=rho_grid(j,i)
-                    conv1 = ((phi_grid(j,i-1) - (two*(phi_grid(j,i))) + phi_grid(j,i+1))/(dx**two))
-                    conv2 = ((phi_grid(j-1,i) - (two*(phi_grid(j,i))) + phi_grid(j+1,i))/(dy**two))
+                    conv1 = ((phi_grid(j,i-1) - (two*(phi_grid(j,i))) + phi_grid(j,i+1))/(dx**2))
+                    conv2 = ((phi_grid(j-1,i) - (two*(phi_grid(j,i))) + phi_grid(j+1,i))/(dy**2))
                     
                     etot = etot + ABS(conv1 + conv2 - dens)
 
@@ -301,19 +301,19 @@ PROGRAM main                !REMEMBER KING, I HAVE INDEXED IN STRANGE WAYS (J,I)
     grid=1.0_REAL64
     
     DO i=0,Nx+1
-        grid(0,i) = 0.0
-        grid((Ny+1),i) = 0.0
+        grid(0,i) = 0.0_REAL64
+        grid((Ny+1),i) = 0.0_REAL64
     END DO
 
     DO i=0,Ny+1
-        grid(i,0) = 0.0
-        grid(i,(Nx+1)) = 0.0
+        grid(i,0) = 0.0_REAL64
+        grid(i,(Nx+1)) = 0.0_REAL64
     END DO
 
 !-------------------------------------------------Set axes to be indexed later-------------------------------------------
 
-    axis_range(1)=-1
-    axis_range(2)=1
+    axis_range(1)=-1.0_REAL64
+    axis_range(2)=1.0_REAL64
     CALL create_axis(x_axis, Nx, axis_range)
     !PRINT*,x_axis
     CALL create_axis(y_axis, Ny, axis_range)
@@ -325,7 +325,7 @@ PROGRAM main                !REMEMBER KING, I HAVE INDEXED IN STRANGE WAYS (J,I)
 
 !--------------------------------------------------Generate rho_grid-----------------------------------------------------
     
-    lower=0
+    lower=0_INT32
     ALLOCATE(rho_grid(0:Ny+1,0:Nx+1))
     rho_grid = grid
     IF(rho == 'null' .OR. rho == 'NULL' .OR. rho == 'Null') THEN !It is plausible that users will use upper and lower case values of init interchangeably. Thus, the code is written to allow this. 
