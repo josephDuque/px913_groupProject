@@ -147,9 +147,9 @@ MODULE phi_calc
         INTEGER, INTENT(IN) :: lower, Nx, Ny
         REAL(REAL64), INTENT(IN) :: dx, dy
         REAL(REAL64), DIMENSION(lower:,lower:), INTENT(INOUT) :: rho_grid, phi_grid
-        REAL(REAL64) :: dens, div1, div2, two, denom
-        REAL(REAL64) :: etot, conv1, conv2, drms_sum, drms
-        INTEGER :: i, j, N, zed
+        REAL(REAL64) :: dens, div1, div2, two, denom, N
+        REAL(REAL64) :: etot, conv1, conv2, drms_sum, drms,drms1
+        INTEGER :: i, j, zed
 
         two = 2.0_REAL64
 
@@ -157,6 +157,32 @@ MODULE phi_calc
         drms = 1.0_REAL64
 
         zed=0
+        DO i=1,Nx
+            DO j=1,Ny                
+                dens=rho_grid(j,i)                                      
+                div1=((phi_grid(j,i+1) + phi_grid(j,i-1))/(dx**two))
+                div2=((phi_grid(j+1,i) + phi_grid(j-1,i))/(dy**two))
+                denom=((two/(dx**two))+(two/(dy**two)))
+                phi_grid(j,i)=(-(ABS(dens-div1-div2)/denom))            !Calculate one initial set of elements for phi grid.
+                                                                        !ABS() in final line of DO loop initializes grid to give           
+            END DO                                                      !positive values of 'dmrs', allowing convergence criteria to work.
+
+        END DO
+
+        print*,phi_grid
+
+        DO i=1,Nx
+            DO j=1,Ny                
+                dens=rho_grid(j,i)                                      
+                div1=((phi_grid(j,i+1) + phi_grid(j,i-1))/(dx**two))
+                div2=((phi_grid(j+1,i) + phi_grid(j-1,i))/(dy**two))
+                denom=((two/(dx**two))+(two/(dy**two)))
+                phi_grid(j,i)=(-((dens-div1-div2)/denom))            !Calculate one initial set of elements for phi grid.
+                                                                        !ABS() in final line of DO loop initializes grid to give           
+            END DO                                                      !positive values of 'dmrs', allowing convergence criteria to work.
+
+        END DO
+        
 
         DO WHILE(etot/drms > 0.00001_REAL64)
             
@@ -172,12 +198,13 @@ MODULE phi_calc
 
             END DO
 
-            N = Nx*Ny                                                        !Total no. of elements
+            N = REAL(Nx, kind=REAL64)*REAL(Ny, kind=REAL64)                                                        !Total no. of elements
 
             etot = 0.0_REAL64
-            drms_sum = 0.0_REAL64       !Initialise
+            drms_sum = 0.0_REAL64       !(Re-)Initialise values
             drms = 0.0_REAL64
-            
+
+        
             DO i=1,Nx
                 DO j=1,Ny
                     
@@ -188,20 +215,33 @@ MODULE phi_calc
                     etot = etot + ABS(conv1 + conv2 - dens)
 
                     drms_sum = drms_sum + conv1 + conv2
+
+                    !PRINT*,ABS(drms_sum)
+                    !PRINT*,1/N
+                    !PRINT*,(1/N)*(ABS(drms_sum))
                 
                 END DO
             
             END DO
 
-            drms = SQRT((1/N)*(ABS(drms_sum)))
+            drms = SQRT((1/N)*((drms_sum)))
+            drms1 = SQRT((1/N)*(ABS(drms_sum)))        
             zed=zed+1
         
         END DO
-        !PRINT*,'zed=', zed
+        PRINT*,'------------------------------------------------------------------------------'
+        PRINT*,'------------------------------------------------------------------------------'
+        PRINT*,'------------------------------------------------------------------------------'
+        PRINT*,'zed=',zed
+        PRINT*,etot/drms
+        PRINT*, etot/drms1
+        PRINT*,'------------------------------------------------------------------------------'
+        PRINT*,'------------------------------------------------------------------------------'
         !PRINT*,etot
         !PRINT*,'------------------------------------------------------------------------------'
         !PRINT*,drms_sum
         !PRINT*,'------------------------------------------------------------------------------'
+        !PRINT*,drms
    
 
 
@@ -320,15 +360,17 @@ PROGRAM main                !REMEMBER KING, I HAVE INDEXED IN STRANGE WAYS (J,I)
     ALLOCATE(E_field_x(Ny,Nx))
     ALLOCATE(E_field_y(Ny,Nx))
     
-    DO i=1,1000
-        CALL phi(lower, phi_grid, Nx, Ny, rho_grid, dx, dy)
-        CALL E_fields(E_field_x, E_field_y, phi_grid, dx, dy, Nx, Ny,lower)
-    END DO
+    !DO i=1,1000
+    CALL phi(lower, phi_grid, Nx, Ny, rho_grid, dx, dy)
+    CALL E_fields(E_field_x, E_field_y, phi_grid, dx, dy, Nx, Ny,lower)
+!    END DO
 
     !PRINT*,rho_grid
     !PRINT*,'---------------------------------------------------------------------------'
     !PRINT*,phi_grid
-    !RINT*,'---------------------------------------------------------------------------'
+    !PRINT*,'---------------------------------------------------------------------------'
+    Print*,E_field_x
+    !PRINT*,E_field_y
     
 
     
