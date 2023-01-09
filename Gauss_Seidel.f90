@@ -169,20 +169,6 @@ MODULE phi_calc
 
         END DO
 
-        print*,phi_grid
-
-        DO i=1,Nx
-            DO j=1,Ny                
-                dens=rho_grid(j,i)                                      
-                div1=((phi_grid(j,i+1) + phi_grid(j,i-1))/(dx**2))
-                div2=((phi_grid(j+1,i) + phi_grid(j-1,i))/(dy**2))
-                denom=((two/(dx**2))+(two/(dy**2)))
-                phi_grid(j,i)=(-((dens-div1-div2)/denom))            !Calculate one initial set of elements for phi grid.
-                                                                        !ABS() in final line of DO loop initializes grid to give           
-            END DO                                                      !positive values of 'dmrs', allowing convergence criteria to work.
-
-        END DO
-        
 
         DO WHILE(etot/drms > 0.00001_REAL64)
             
