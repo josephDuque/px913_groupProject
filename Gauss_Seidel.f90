@@ -215,14 +215,14 @@ MODULE phi_calc
             zed=zed+1
         
         END DO
-        PRINT*,'------------------------------------------------------------------------------'
-        PRINT*,'------------------------------------------------------------------------------'
-        PRINT*,'------------------------------------------------------------------------------'
-        PRINT*,'zed=',zed
-        PRINT*,etot/drms
-        PRINT*, etot/drms1
-        PRINT*,'------------------------------------------------------------------------------'
-        PRINT*,'------------------------------------------------------------------------------'
+        !PRINT*,'------------------------------------------------------------------------------'
+        !PRINT*,'------------------------------------------------------------------------------'
+        !PRINT*,'------------------------------------------------------------------------------'
+        !PRINT*,'zed=',zed
+        !PRINT*,etot/drms
+        !PRINT*, etot/drms1
+        !PRINT*,'------------------------------------------------------------------------------'
+        !PRINT*,'------------------------------------------------------------------------------'
         !PRINT*,etot
         !PRINT*,'------------------------------------------------------------------------------'
         !PRINT*,drms_sum
@@ -273,7 +273,7 @@ PROGRAM main                !REMEMBER KING, I HAVE INDEXED IN STRANGE WAYS (J,I)
     USE command_line
     USE Electric_field
     IMPLICIT NONE
-    INTEGER :: Ny, Nx, i, lower
+    INTEGER :: Ny, Nx, i, lower,j
     REAL(REAL64), DIMENSION(:,:), ALLOCATABLE :: grid, rho_grid, phi_grid, E_field_x, E_field_y
     REAL(REAL64), DIMENSION(:), ALLOCATABLE :: x_axis, y_axis
     REAL(REAL64), DIMENSION(2) :: axis_range
@@ -346,20 +346,34 @@ PROGRAM main                !REMEMBER KING, I HAVE INDEXED IN STRANGE WAYS (J,I)
     ALLOCATE(E_field_x(Ny,Nx))
     ALLOCATE(E_field_y(Ny,Nx))
     
-    !DO i=1,1000
+    
     CALL phi(lower, phi_grid, Nx, Ny, rho_grid, dx, dy)
     CALL E_fields(E_field_x, E_field_y, phi_grid, dx, dy, Nx, Ny,lower)
-!    END DO
-
-    !PRINT*,rho_grid
-    !PRINT*,'---------------------------------------------------------------------------'
-    !PRINT*,phi_grid
-    !PRINT*,'---------------------------------------------------------------------------'
-    Print*,E_field_x
-    !PRINT*,E_field_y
-    
 
     
+
+
+    open (10 , file = "xE_field.txt" , form = 'formatted')
+
+    23 FORMAT (3 ( ES23 .12 E3 ) )
+    do i = 1, Ny
+        write (10,23) (E_field_x(i, j), j = 1, Nx)
+    end do 
+!    close(10)
+
+    open (11 , file = "yE_field.txt" , form = 'formatted')
+
+    !23 FORMAT (3 ( ES23 .12 E3 ) )
+    do i = 1, Ny
+        write (11,23) (E_field_y(i, j), j = 1, Nx)
+    end do
+    
+    close(10)
+    close(11)
+
+    PRINT*, E_field_y
+      
+
     
     
     
@@ -373,9 +387,8 @@ PROGRAM main                !REMEMBER KING, I HAVE INDEXED IN STRANGE WAYS (J,I)
     
     
     
-    !print*,lbound(rho_grid)
-    !print*,ubound(rho_grid)
-    !PRINT*, rho_grid
+    
+
     DEALLOCATE(rho_grid)
     DEALLOCATE(grid)
     DEALLOCATE(phi_grid)
@@ -387,3 +400,19 @@ PROGRAM main                !REMEMBER KING, I HAVE INDEXED IN STRANGE WAYS (J,I)
 
 
 END PROGRAM main
+
+
+
+!-------------------Graveyard-----------------------------
+
+    !print*,lbound(rho_grid)
+    !print*,ubound(rho_grid)
+    !PRINT*, rho_grid
+
+
+    !PRINT*,rho_grid
+    !PRINT*,'---------------------------------------------------------------------------'
+    !PRINT*,phi_grid
+    !PRINT*,'---------------------------------------------------------------------------'
+    !Print*,E_field_x
+    !PRINT*,E_field_y
