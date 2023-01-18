@@ -78,19 +78,19 @@ MODULE subroutines
         INTEGER, INTENT(IN) :: lower, Nx, Ny
         REAL(REAL64), DIMENSION(2), INTENT(OUT) :: initPos, initVel
         REAL(REAL64), DIMENSION(lower:,lower:), INTENT(INOUT) :: rho_grid
-        REAL(REAL64), DIMENSION(:), INTENT(IN) :: x_axis, y_axis
+        REAL(REAL64), DIMENSION(lower:), INTENT(IN) :: x_axis, y_axis
         REAL(REAL64) :: x_div, y_div, z_1
         INTEGER :: i,j
 
-
+        rho_grid = 0.0_REAL64
         z_1 = 0.1_REAL64
 
             
         DO i=1,Nx
-            x_div = ((x_axis(i))/z_1)        
+            x_div = (x_axis(i)/z_1)**2       
             DO j=1,Ny
-                y_div = ((y_axis(j))/z_1)
-                rho_grid(j,i) = EXP(-(x_div**2)-(y_div**2))
+                y_div = (y_axis(j)/z_1)**2
+                rho_grid(j,i) = EXP(-1.0_REAL64*(x_div + y_div))
             
             END DO
         
@@ -109,7 +109,7 @@ MODULE subroutines
         INTEGER, INTENT(IN) :: lower, Nx, Ny
         REAL(REAL64), DIMENSION(2), INTENT(OUT) :: initPos, initVel
         REAL(REAL64), DIMENSION(lower:,lower:), INTENT(INOUT) :: rho_grid
-        REAL(REAL64), DIMENSION(:), INTENT(IN) :: x_axis, y_axis
+        REAL(REAL64), DIMENSION(lower:), INTENT(IN) :: x_axis, y_axis
         REAL(REAL64) :: x_div, y_div, extra_divx, extra_divy, z_1, z_2
         INTEGER :: i, j
         
@@ -355,9 +355,12 @@ PROGRAM main                !REMEMBER KING, I HAVE INDEXED IN STRANGE WAYS (J,I)
 
     axis_range(1)=-1.0_REAL64
     axis_range(2)=1.0_REAL64
-    CALL create_axis(x_axis, Nx, axis_range, delta=dx)
-    CALL create_axis(y_axis, Ny, axis_range, delta=dy)
+    CALL create_axis(x_axis, Nx, axis_range, nghosts=1, delta=dx)
+    CALL create_axis(y_axis, Ny, axis_range, nghosts=1, delta=dy)
 
+    !DO i=0, Nx+1
+    !  PRINT *, x_axis(i)
+    !END DO
 !--------------------------------------------------Generate rho_grid-----------------------------------------------------
     
     lower=0_INT32
