@@ -85,7 +85,6 @@ MODULE subroutines
 
         z_1 = 0.1_REAL64
 
-
             
         DO i=1,Nx
             x_div = ((x_axis(i))/z_1)        
@@ -329,7 +328,7 @@ PROGRAM main                !REMEMBER KING, I HAVE INDEXED IN STRANGE WAYS (J,I)
     REAL(REAL64), DIMENSION(2) :: pPos, pVel, pAcc, axis_range
     REAL(REAL64), DIMENSION(2, 0:iterations) :: positions, velocities, accels
     REAL(REAL64), DIMENSION(:,:), ALLOCATABLE :: grid, rho_grid, phi_grid, E_field_x, E_field_y, &
-      & netcdf_rho, netcdf_phi, netcdf_Ex, netcdf_Ey
+      & netcdf_rho, netcdf_phi
     REAL(REAL64), DIMENSION(:), ALLOCATABLE :: x_axis, y_axis
     CHARACTER(len=25) :: rho
     CHARACTER(LEN=*), PARAMETER :: netcdf_filename = 'particle-move.nc'
@@ -423,33 +422,20 @@ PROGRAM main                !REMEMBER KING, I HAVE INDEXED IN STRANGE WAYS (J,I)
       CALL verletAlg(pPos, pVel, pAcc, E_field_x, E_field_y, eCharge, dx, dy, dt)
       positions(:, i) = pPos; velocities(:, i) = pVel; accels(:, i) = pAcc
     END DO
-    !----------------------------------------------------------------- 
+    !-----------------------------------------------------------------
 
-    ALLOCATE(netcdf_rho(Nx, Ny))
-    ALLOCATE(netcdf_phi(Nx, Ny))
-    ALLOCATE(netcdf_Ex(Nx, Ny))
-    ALLOCATE(netcdf_Ey(Nx, Ny))
-
-
-    ! Transposing the arrays for netcdf output as per the specification:
-    netcdf_rho = TRANSPOSE(rho_grid(1:Ny, 1:Nx))
-    netcdf_phi = TRANSPOSE(phi_grid(1:Ny, 1:Nx))
-    netcdf_Ex = TRANSPOSE(E_field_x(1:Ny, 1:Nx))
-    netcdf_Ey = TRANSPOSE(E_field_y(1:Ny, 1:Nx))
-
-
+    ALLOCATE(netcdf_rho(Ny, Nx))
+    ALLOCATE(netcdf_phi(Ny, Nx))
 
     !----------------------------------------------------------------- 
     ! Call the netcdf writer subroutine:
-    CALL write_sub(positions, velocities, accels, netcdf_rho, netcdf_phi, netcdf_Ex, netcdf_Ey, Nx, Ny, &
+    CALL write_sub(positions, velocities, accels, rho_grid, phi_grid, E_field_x, E_field_y, Nx, Ny, &
      & iterations, netcdf_filename, neterr, code_filename, rho)
     !----------------------------------------------------------------- 
     
-    
-    DEALLOCATE(netcdf_Ey)
-    DEALLOCATE(netcdf_Ex)
-    DEALLOCATE(netcdf_phi)
+
     DEALLOCATE(netcdf_rho)
+    DEALLOCATE(netcdf_phi)
     DEALLOCATE(rho_grid)
     DEALLOCATE(grid)
     DEALLOCATE(phi_grid)
@@ -497,3 +483,22 @@ END PROGRAM main
 !    
 !    close(10)
 !    close(11)
+!
+    ! Here I thought the specification wanted the arrays outputted with dimensions (Nx, Ny) 
+    ! but when plotting I noticed they were rotated:
+!   ALLOCATE(netcdf_rho(Nx, Ny))
+!   ALLOCATE(netcdf_phi(Nx, Ny))
+!   ALLOCATE(netcdf_Ex(Nx, Ny))
+!   ALLOCATE(netcdf_Ey(Nx, Ny))
+!
+!
+!   ! Transposing the arrays for netcdf output as per the specification:
+!   netcdf_rho = TRANSPOSE(rho_grid(1:Ny, 1:Nx))
+!   netcdf_phi = TRANSPOSE(phi_grid(1:Ny, 1:Nx))
+!   netcdf_Ex = TRANSPOSE(E_field_x(1:Ny, 1:Nx))
+!   netcdf_Ey = TRANSPOSE(E_field_y(1:Ny, 1:Nx))
+!   
+!   DEALLOCATE(netcdf_Ey)
+!   DEALLOCATE(netcdf_Ex)
+!   DEALLOCATE(netcdf_phi)
+!   DEALLOCATE(netcdf_rho)

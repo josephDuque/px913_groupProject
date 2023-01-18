@@ -31,7 +31,7 @@ MODULE write_netcdf
       & Ex, Ey, Nx, Ny, iter, filename, neterr, code_name, init)
     INTEGER, INTENT(IN) :: Nx, Ny, iter
     REAL(REAL64), DIMENSION(2, 0:iter) :: positions, velocities, accels
-    REAL(REAL64), DIMENSION(Nx, Ny) :: rho_grid, phi_grid, Ex, Ey
+    REAL(REAL64), DIMENSION(Ny, Nx) :: rho_grid, phi_grid, Ex, Ey
     INTEGER, PARAMETER :: numDims = 4
     INTEGER, DIMENSION(numDims) :: sizes, dim_ids
     CHARACTER(LEN=20), DIMENSION(numDims) :: dims
@@ -40,12 +40,11 @@ MODULE write_netcdf
     INTEGER, DIMENSION(7) :: var_ids
     INTEGER :: neterr, file_id, i
     TYPE(run_data) :: runDat
-
-    dims(1) = "x-y components"
-    dims(2) = "iteration"
-    dims(3) = "x"
-    dims(4) = "y"
-
+    
+    dims(1) = "y"
+    dims(2) = "x"
+    dims(3) = "x-y components"
+    dims(4) = "iteration"
 
     runDat%code_filename = code_name
     runDat%initialState = init
@@ -116,7 +115,7 @@ MODULE write_netcdf
 
     print *, 'desnity rho array id...'
     ! Define the positions array variable type, and assigning variable ID:
-    neterr = nf90_def_var(file_id, "Density rho", NF90_INT, dim_ids(1:2), var_ids(1))
+    neterr = nf90_def_var(file_id, "Density rho", NF90_REAL, dim_ids(1:2), var_ids(1))
     IF (neterr /= nf90_noerr) THEN
       PRINT *, TRIM(nf90_strerror(neterr))
       RETURN
@@ -124,7 +123,7 @@ MODULE write_netcdf
 
     print *, 'potential phi array id...'
     ! Define the positions array variable type, and assigning variable ID:
-    neterr = nf90_def_var(file_id, "Potential phi", NF90_INT, dim_ids(1:2), var_ids(2))
+    neterr = nf90_def_var(file_id, "Potential phi", NF90_REAL, dim_ids(1:2), var_ids(2))
     IF (neterr /= nf90_noerr) THEN
       PRINT *, TRIM(nf90_strerror(neterr))
       RETURN
@@ -132,7 +131,7 @@ MODULE write_netcdf
 
     print *, 'Ex array id...'
     ! Define the positions array variable type, and assigning variable ID:
-    neterr = nf90_def_var(file_id, "Electric field x-component", NF90_INT, dim_ids(1:2), var_ids(3))
+    neterr = nf90_def_var(file_id, "Electric field x-component", NF90_REAL, dim_ids(1:2), var_ids(3))
     IF (neterr /= nf90_noerr) THEN
       PRINT *, TRIM(nf90_strerror(neterr))
       RETURN
@@ -140,7 +139,7 @@ MODULE write_netcdf
 
     print *, 'Ey array id...'
     ! Define the positions array variable type, and assigning variable ID:
-    neterr = nf90_def_var(file_id, "Electric field y-component", NF90_INT, dim_ids(1:2), var_ids(4))
+    neterr = nf90_def_var(file_id, "Electric field y-component", NF90_REAL, dim_ids(1:2), var_ids(4))
     IF (neterr /= nf90_noerr) THEN
       PRINT *, TRIM(nf90_strerror(neterr))
       RETURN
@@ -148,7 +147,7 @@ MODULE write_netcdf
 
     print *, 'positions array id...'
     ! Define the positions array variable type, and assigning variable ID:
-    neterr = nf90_def_var(file_id, "Positions", NF90_INT, dim_ids(3:4), var_ids(5))
+    neterr = nf90_def_var(file_id, "Positions", NF90_REAL, dim_ids(3:4), var_ids(5))
     IF (neterr /= nf90_noerr) THEN
       PRINT *, TRIM(nf90_strerror(neterr))
       RETURN
@@ -156,7 +155,7 @@ MODULE write_netcdf
 
     print *, 'velocities array id...'
     ! Define the positions array variable type, and assigning variable ID:
-    neterr = nf90_def_var(file_id, "Velocities", NF90_INT, dim_ids(3:4), var_ids(6))
+    neterr = nf90_def_var(file_id, "Velocities", NF90_REAL, dim_ids(3:4), var_ids(6))
     IF (neterr /= nf90_noerr) THEN
       PRINT *, TRIM(nf90_strerror(neterr))
       RETURN
@@ -164,7 +163,7 @@ MODULE write_netcdf
 
     print *, 'accelerations array id...'
     ! Define the positions array variable type, and assigning variable ID:
-    neterr = nf90_def_var(file_id, "Accelerations", NF90_INT, dim_ids(3:4), var_ids(7))
+    neterr = nf90_def_var(file_id, "Accelerations", NF90_REAL, dim_ids(3:4), var_ids(7))
     IF (neterr /= nf90_noerr) THEN
       PRINT *, TRIM(nf90_strerror(neterr))
       RETURN
