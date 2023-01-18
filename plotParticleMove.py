@@ -25,12 +25,14 @@ plt.imshow(efieldx_data[::-1, :], cmap='seismic')
 # Add a colorbar
 plt.colorbar()
 
+# Save the figure:
+plt.savefig('double-rho-erroneous.png', dpi=300)
+
 plt.show()
 
 # Positions scatterplot:
 #plt.scatter(xPositions, yPositions)
-# Show the plot
+# Show the cplot
 #plt.show()
 
-# Save the figure:
-#plt.savefig('single-rho.png', dpi=300)
+
