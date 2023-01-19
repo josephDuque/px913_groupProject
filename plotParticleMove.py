@@ -27,7 +27,7 @@ plt.xlabel('x axis')
 plt.ylabel('y axis')
 
 # Save the figure:
-#plt.savefig('double-rho-erroneous.png', dpi=300)
+plt.savefig('rho_field.png', dpi=300)
 
 plt.show()
 
@@ -36,6 +36,9 @@ plt.scatter(xPositions[::10], yPositions[::10], s=4)
 plt.xlabel('x position [m]')
 plt.ylabel('y position [m]')
 plt.grid()
+
+# Save the figure:
+plt.savefig('positions_scatterPlot.png', dpi=300)
 # Show the cplot
 plt.show()
 

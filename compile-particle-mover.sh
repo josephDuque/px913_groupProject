@@ -21,3 +21,5 @@ $fc -Wall -Wpedantic -g -std=f2008 $fortranfiles -o $outfile $fboth
 
 #Run the executable script:
 ./$outfile Nx=100 Ny=100 rho=single
+
+python3 plotParticleMove.py
