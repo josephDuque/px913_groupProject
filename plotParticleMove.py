@@ -1,6 +1,5 @@
 #!/usr/bin/env /usr/local/anaconda3/bin/python3
 #
-#Import modules
 import netCDF4
 from netCDF4 import Dataset
 import numpy as np
@@ -20,19 +19,24 @@ yPositions = positions[:, 1]
 # Close the netCDF file
 ncfile.close()
 
-plt.imshow(efieldx_data[::-1, :], cmap='seismic')
+plt.imshow(np.transpose(efieldx_data), cmap='seismic')
 
 # Add a colorbar
 plt.colorbar()
+plt.xlabel('x axis')
+plt.ylabel('y axis')
 
 # Save the figure:
-plt.savefig('double-rho-erroneous.png', dpi=300)
+#plt.savefig('double-rho-erroneous.png', dpi=300)
 
 plt.show()
 
 # Positions scatterplot:
-#plt.scatter(xPositions, yPositions)
+plt.scatter(xPositions[::10], yPositions[::10], s=4)
+plt.xlabel('x position [m]')
+plt.ylabel('y position [m]')
+plt.grid()
 # Show the cplot
-#plt.show()
+plt.show()
 
 

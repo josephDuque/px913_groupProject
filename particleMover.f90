@@ -325,10 +325,9 @@ PROGRAM main                !REMEMBER KING, I HAVE INDEXED IN STRANGE WAYS (J,I)
     INTEGER, DIMENSION(2) :: pPosIndex
     REAL(REAL64) :: dx, dy
     REAL(REAL64), PARAMETER :: dt = (1.0_REAL64)*1.0e-2, eCharge = -1.0_REAL64 !eCharge = (1.602176634_REAL64)*1.0e-19
-    REAL(REAL64), DIMENSION(2) :: pPos, pVel, pAcc, axis_range
+    REAL(REAL64), DIMENSION(2) :: pPos, pVel, pAcc, axis_range, axis_range2
     REAL(REAL64), DIMENSION(2, 0:iterations) :: positions, velocities, accels
-    REAL(REAL64), DIMENSION(:,:), ALLOCATABLE :: grid, rho_grid, phi_grid, E_field_x, E_field_y, &
-      & netcdf_rho, netcdf_phi
+    REAL(REAL64), DIMENSION(:,:), ALLOCATABLE :: grid, rho_grid, phi_grid, E_field_x, E_field_y
     REAL(REAL64), DIMENSION(:), ALLOCATABLE :: x_axis, y_axis
     CHARACTER(len=25) :: rho
     CHARACTER(LEN=*), PARAMETER :: netcdf_filename = 'particle-move.nc'
@@ -355,8 +354,10 @@ PROGRAM main                !REMEMBER KING, I HAVE INDEXED IN STRANGE WAYS (J,I)
 
     axis_range(1)=-1.0_REAL64
     axis_range(2)=1.0_REAL64
+    axis_range2(1)=1.0_REAL64
+    axis_range2(2)=-1.0_REAL64
     CALL create_axis(x_axis, Nx, axis_range, nghosts=1, delta=dx)
-    CALL create_axis(y_axis, Ny, axis_range, nghosts=1, delta=dy)
+    CALL create_axis(y_axis, Ny, axis_range2, nghosts=1, delta=dy)
 
     !DO i=0, Nx+1
     !  PRINT *, x_axis(i)
@@ -427,18 +428,14 @@ PROGRAM main                !REMEMBER KING, I HAVE INDEXED IN STRANGE WAYS (J,I)
     END DO
     !-----------------------------------------------------------------
 
-    ALLOCATE(netcdf_rho(Ny, Nx))
-    ALLOCATE(netcdf_phi(Ny, Nx))
 
     !----------------------------------------------------------------- 
     ! Call the netcdf writer subroutine:
-    CALL write_sub(positions, velocities, accels, rho_grid, phi_grid, E_field_x, E_field_y, Nx, Ny, &
+    CALL write_sub(positions, velocities, accels, rho_grid(1:Ny, 1:Nx), phi_grid(1:Ny, 1:Nx), E_field_x, E_field_y, Nx, Ny, &
      & iterations, netcdf_filename, neterr, code_filename, rho)
     !----------------------------------------------------------------- 
     
 
-    DEALLOCATE(netcdf_rho)
-    DEALLOCATE(netcdf_phi)
     DEALLOCATE(rho_grid)
     DEALLOCATE(grid)
     DEALLOCATE(phi_grid)
