@@ -6,9 +6,9 @@ So basically, use this readme to update/explain work you've done so far. Feel fr
 ----------------------------------------------------------------------------------------------
 ------------------------------------Joseph:---------------------------------------------------
 1. I made github rep :)
-
-
-
+2. I have included the Verlet algorithm and joined it with the Gauss Seidel code in 1 program called particleMover.f90
+3. I have written the netcdf writer code and started the python plotting, we can meet up this week to finish. 
+4. Pushed some edits and final fixes to the repo.
 
 ----------------------------------------------------------------------------------------------
 -------------------------------------Jake:----------------------------------------------------
