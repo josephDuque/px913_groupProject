@@ -68,3 +68,5 @@ $fc -Wall -Wpedantic -g -std=f2008 $fortranfiles -o $outfile $fboth
 
 #Run the executable script:
 ./$outfile $nxArg $nyArg $initArg
+
+python3 plotParticleMove.py
